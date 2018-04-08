@@ -7,6 +7,7 @@ Donald MacIntyre - djm4912
 """
 
 import math
+import random
 
 def conv(x,h):
     n = len(x) + len(h) - 1
@@ -19,7 +20,7 @@ def conv(x,h):
 def dot_prod(x,h):
     y = 0
     if len(x) != len(h):
-        print('Problem')
+        print('Length does not match')
     for i in range(len(x)):
         y += x[i]*h[i]
     return y
@@ -36,19 +37,16 @@ def shift(x,val):
 def main() :
 
     N = 100000
-    f = 10
     n = []
     x = []    
-    channel = [10, 3, 1]
+    channel = [10, 3.5, 1]
     weights = [0]*3
     param = 0.25
 
-    x.append(0)
-    x.append(0)
-
     for i in range(N):
         n.append(i)
-        x.append(math.cos(2*math.pi*(1/f)*i))
+        r = 2*(random.random()-0.5)
+        x.append(r)
 
     d = conv(x,channel)
 

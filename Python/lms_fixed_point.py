@@ -89,7 +89,6 @@ def main() :
         error = d[i] - lms_res
         for w in range(len(weights)):
             weights[w] += floating_point_multiply(shift_reg[w],error)
-            #weights[w] += 2*param*shift_reg[w]*error
 
     print(weights)
     float_weights = []

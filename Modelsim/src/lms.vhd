@@ -11,10 +11,18 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.std_logic_unsigned.all;
+use ieee.numeric_std.all;
+
+use work.lms_pkg.all;
 
 entity lms is
     Port (
+        clk         : in std_logic;
+        rst         : in std_logic;
+        in_valid    : in std_logic;
+        xin         : in signed(15 downto 0);
+        expected    : in signed(15 downto 0);
+        out_valid   : out std_logic
     );
 end lms;
 

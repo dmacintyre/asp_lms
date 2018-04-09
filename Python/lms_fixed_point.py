@@ -64,11 +64,11 @@ def main() :
     N = 10000
     n = []
     x = []    
-    channel = [0.5, 0.1, 0.01]
+    channel = [0.5, 0.0, 0.1]
     channel_fixed = []
     for i in channel:
         channel_fixed.append(floating_point_to_fixed_point(i))
-    weights = [0]*3
+    weights = [0]*4
     param = 1
 
     for i in range(N):

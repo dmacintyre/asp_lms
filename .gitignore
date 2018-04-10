@@ -1,0 +1,9 @@
+*.dat
+Modelsim/vsim.wlf
+*.dbs
+Modelsim/work/lms_tb/tb.prw
+*.prw
+Modelsim/work/lms_pkg/_vhdl.psm
+*.psm
+Modelsim/work/_vmake
+Modelsim/work/_info

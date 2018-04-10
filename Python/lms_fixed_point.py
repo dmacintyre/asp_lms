@@ -20,7 +20,7 @@ def conv(x,h):
     y = [0]*n
     for i in range(len(x)):
         for j in range(len(h)):
-            y[i+j] += floating_point_multiply(x[i], h[j])
+            y[i+j] += fixed_point_multiply(x[i], h[j])
     return y
 
 def dot_prod(x,h):
@@ -28,7 +28,7 @@ def dot_prod(x,h):
     if len(x) != len(h):
         print('Length does not match')
     for i in range(len(x)):
-        y += floating_point_multiply(x[i], h[i])
+        y += fixed_point_multiply(x[i], h[i])
     return y
 
 def shift(x,val):
@@ -47,7 +47,7 @@ def fixed_point_to_floating_point(n):
     return n * RESOLUTION
 
 # Multiply to Q15 numbers and return a Q15 number
-def floating_point_multiply(x1, x2):
+def fixed_point_multiply(x1, x2):
     #Q15 * Q15 produces a Q30 number
     temp = x1*x2
     #r is now a Q30 number. Convert back to a Q15 by shifting right by 15
@@ -56,7 +56,7 @@ def floating_point_multiply(x1, x2):
     if temp > ((2**15)-1):
         print('OVERFLOW', temp)
     elif temp < (-(2**15)):
-        print('UNDERFLOW')
+        print('UNDERFLOW', temp)
     return temp
 
 def main() :
@@ -64,7 +64,7 @@ def main() :
     N = 10000
     n = []
     x = []    
-    channel = [0.5, 0.0, 0.1]
+    channel = [0.25, 0.01, 0, 0.27]
     channel_fixed = []
     for i in channel:
         channel_fixed.append(floating_point_to_fixed_point(i))
@@ -77,6 +77,18 @@ def main() :
         x.append(floating_point_to_fixed_point(r))
 
     d = conv(x,channel_fixed)
+    
+    # Write an output file that can be used by VHDL simulation containing LMS input data
+    # File format is: expected_channel_input actual_channel_output
+    of = open('input_data.txt', 'w')
+    
+    for i in range(N):
+        of.write(str(x[i]))
+        of.write(' ')
+        of.write(str(d[i]))
+        of.write('\n')
+    
+    of.close()
 
     shift_reg = [0]*len(weights)
 
@@ -88,7 +100,7 @@ def main() :
         lms_res = dot_prod(shift_reg, weights)
         error = d[i] - lms_res
         for w in range(len(weights)):
-            weights[w] += floating_point_multiply(shift_reg[w],error)
+            weights[w] += fixed_point_multiply(shift_reg[w],error)
 
     print(weights)
     float_weights = []

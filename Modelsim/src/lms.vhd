@@ -1,12 +1,10 @@
 --------------------------------------------------------------------------------
--- Project : PROJECTNAME
+-- Project : LMS
 -- Author : Donald MacIntyre - djm4912
 -- Date : 4/8/2018
 -- File : lms.vhd
 --------------------------------------------------------------------------------
--- Description :
---------------------------------------------------------------------------------
--- $Log$
+-- Description : LMS implementation 
 --------------------------------------------------------------------------------
 
 library IEEE;
@@ -39,11 +37,14 @@ signal weight_update_valid : std_logic;
 signal shift_valid      : std_logic;
 signal dot_prod_valid   : std_logic;
 signal dot_out_valid   : std_logic;
+signal mu_update_valid : std_logic;
 signal lms_res          : signed(15 downto 0);
 signal error            : signed(15 downto 0);
 signal error_valid : std_logic;
 signal weight_update_q30 : q30_reg_t;
 signal expected_latch : signed(15 downto 0);
+
+constant lms_conv_shift_param : natural := 0; 
 --------------------------------------------------------------------------------
 -- Component Declarations
 --------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ begin
         dot_prod_valid <= '0';
         error_valid <= '0';
         weight_update_valid <= '0';
+        mu_update_valid <= '0';
     
         -- Shift in the latest sample
         if in_valid = '1' then
@@ -129,8 +131,17 @@ begin
             end loop;
         end if;
         
-        -- Register the new weights
+        -- Multiply by the constant mu
+        -- This is implemented as a shift right for efficiency
         if weight_update_valid = '1' then
+            mu_update_valid <= '1';
+            for i in 0 to NUM_TAPS-1 loop
+                weight_update_q30(i) <= shift_right(weight_update_q30(i),lms_conv_shift_param);
+            end loop;
+        end if;
+        
+        -- Register the new weights
+        if mu_update_valid = '1' then
             out_valid <= '1';
             for i in 0 to NUM_TAPS-1 loop
                 weights(i) <= weights(i) + signed(weight_update_q30(i)(30 downto 15));
